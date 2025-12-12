@@ -26,26 +26,19 @@ pipeline {
 
         stage('Login to DockerHub') {
             steps {
-                    withCredentials([usernamePassword(
+                withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) 
-                {
-                sh """ 
-                    printf "%s" "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
-                """
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh "echo $PASS | docker login -u $USER --password-stdin"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh """
-                    docker push ${REGISTRY}:${BUILD_NUMBER}
-                    docker tag ${REGISTRY}:${BUILD_NUMBER} ${REGISTRY}:latest
-                    docker push ${REGISTRY}:latest
-                """
+                sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
             }
         }
 
