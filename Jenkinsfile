@@ -28,17 +28,25 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh "echo $PASS | docker login -u $USER --password-stdin"
+           // Use a single-quoted (''' ''') shell block so Groovy DOES NOT interpolate secrets
+           // Use --password-stdin to avoid password exposure to process list
+                sh '''
+                    printf "%s" "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+                '''
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
+                sh '''
+                    docker push ${REGISTRY}:${BUILD_NUMBER}
+                    docker tag ${REGISTRY}:${BUILD_NUMBER} ${REGISTRY}:latest
+                    docker push ${REGISTRY}:latest
+                '''
             }
         }
 
@@ -56,4 +64,4 @@ pipeline {
         }
     }
 }
-i
+
