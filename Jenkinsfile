@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = "your-dockerhub-username"
+        DOCKERHUB_USER = "veeragudipudi"
         IMAGE_NAME = "sample-app"
     }
 
@@ -13,8 +13,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/your-user/your-repo.git'
+                git branch: 'master',
+                    url: 'https://github.com/veera-gudipudi/Python_Example.git'
             }
         }
 
